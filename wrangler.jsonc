@@ -10,6 +10,14 @@
     "binding": "ASSETS",
   },
   "observability": { "enabled": true },
+  // Live domain. www redirects to the bare domain (see custom-worker.ts).
+  "routes": [
+    { "pattern": "cccerithparish.co.uk", "custom_domain": true },
+    { "pattern": "www.cccerithparish.co.uk", "custom_domain": true },
+  ],
+  // Turned off so search engines only see the real domain.
+  "workers_dev": false,
+  "preview_urls": false,
   "d1_databases": [
     {
       "binding": "D1",
@@ -29,8 +37,7 @@
   "send_email": [{ "name": "EMAIL" }],
   "account_id": "e5d5d460d5114f727f30dc01a4b9e363",
   "vars": {
-    // Switch to https://cccerithparish.co.uk when the domain moves to Cloudflare.
-    "NEXT_PUBLIC_SERVER_URL": "https://cccerith.koredujar.workers.dev",
+    "NEXT_PUBLIC_SERVER_URL": "https://cccerithparish.co.uk",
     "CF_ACCOUNT_ID": "e5d5d460d5114f727f30dc01a4b9e363",
     "D1_DATABASE_ID": "dacada53-fc03-4302-aaef-2af959d2d8a8",
   },

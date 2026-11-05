@@ -8,7 +8,14 @@ import { default as handler } from './.open-next/worker.js'
 import { runBackup } from './src/lib/backup'
 
 export default {
-  fetch: handler.fetch,
+  fetch(request: Request, env: CloudflareEnv, ctx: ExecutionContext) {
+    const url = new URL(request.url)
+    if (url.hostname === 'www.cccerithparish.co.uk') {
+      url.hostname = 'cccerithparish.co.uk'
+      return Response.redirect(url.toString(), 301)
+    }
+    return handler.fetch(request, env, ctx)
+  },
   async scheduled(_controller: ScheduledController, env: CloudflareEnv, ctx: ExecutionContext) {
     ctx.waitUntil(
       runBackup(env as unknown as Parameters<typeof runBackup>[0]).catch((err) => {

@@ -34,6 +34,8 @@ bold() { printf '\n\033[1;35m▸ %s\033[0m\n' "$1"; }
 fail() { printf '\n\033[1;31m✖ %s\033[0m\n' "$1" >&2; exit 1; }
 started=$(date +%s)
 export CLOUDFLARE_ENV="${CLOUDFLARE_ENV:-}"
+# NEXT_PUBLIC_* values are baked in at build time, so set the live domain here.
+export NEXT_PUBLIC_SERVER_URL="${NEXT_PUBLIC_SERVER_URL:-https://cccerithparish.co.uk}"
 
 bold "Checking Cloudflare login"
 whoami=$(npx wrangler whoami 2>/dev/null || true)

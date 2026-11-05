@@ -391,6 +391,9 @@ export interface Album {
    * Optional. The first photo is used if empty.
    */
   cover?: (number | null) | Media;
+  /**
+   * Up to 40 photos per album. For bigger events, split them into more than one album.
+   */
   photos: (number | Media)[];
   /**
    * The web address for this item. Leave blank to create it from the title.
