@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 import { Reveal } from '@/components/motion/Reveal'
+import { CalendarLinks } from '@/components/site/CalendarLinks'
 import { Icon } from '@/components/site/Icon'
 import { PageHero } from '@/components/site/PageHero'
 import { RichText } from '@/components/site/RichText'
@@ -23,7 +24,7 @@ export default async function EventPage({ params }: Props) {
 
   return (
     <>
-      <PageHero eyebrow="Special event" title={event.title} intro={event.summary} image={event.image} crumbs={[{ label: 'Events', href: '/events' }]} />
+      <PageHero eyebrow={`${formatDate(event.startDate, { weekday: 'long', day: 'numeric', month: 'long' })}`} title={event.title} intro={event.summary} image={event.image} crumbs={[{ label: 'Events', href: '/events' }]} />
       <section className="section">
         <div className="container detail">
           <Reveal>
@@ -54,6 +55,9 @@ export default async function EventPage({ params }: Props) {
                   </div>
                 ) : null}
               </dl>
+              <div style={{ marginTop: 20 }}>
+                <CalendarLinks event={event} />
+              </div>
             </div>
             <Link href="/events" className="text-link"><Icon name="arrow" size={15} style={{ transform: 'rotate(180deg)' }} /> All services &amp; events</Link>
           </Reveal>

@@ -9,7 +9,7 @@ export const Pages: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'slug', 'updatedAt'],
     group: 'Content',
-    description: 'Text pages such as About Us, Community Service and the policies.',
+    description: 'Text pages such as the policies and the Our Team introduction. (About Us, Community Service and the Home page have their own sections.)',
   },
   access: contentAccess,
   fields: [

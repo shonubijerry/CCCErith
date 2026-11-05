@@ -1,7 +1,7 @@
 import 'server-only'
 
 import config from '@payload-config'
-import { getPayload } from 'payload'
+import { getPayload, type Where } from 'payload'
 import { cache } from 'react'
 
 export const getPayloadClient = cache(async () => getPayload({ config }))
@@ -14,6 +14,16 @@ export const getSiteSettings = cache(async () => {
 export const getHomePage = cache(async () => {
   const payload = await getPayloadClient()
   return payload.findGlobal({ slug: 'home-page', depth: 1 })
+})
+
+export const getAboutPage = cache(async () => {
+  const payload = await getPayloadClient()
+  return payload.findGlobal({ slug: 'about-page', depth: 1 })
+})
+
+export const getCommunityPage = cache(async () => {
+  const payload = await getPayloadClient()
+  return payload.findGlobal({ slug: 'community-page', depth: 1 })
 })
 
 export const getPageBySlug = cache(async (slug: string) => {
@@ -53,9 +63,21 @@ export const getMinistries = cache(async () => {
   return res.docs
 })
 
-export const getSermons = cache(async ({ page = 1, limit = 12 }: { page?: number; limit?: number } = {}) => {
+const yearRange = (year?: number) =>
+  year ? [{ date: { greater_than_equal: `${year}-01-01T00:00:00.000Z` } }, { date: { less_than: `${year + 1}-01-01T00:00:00.000Z` } }] : []
+
+export const getSermons = cache(async ({ page = 1, limit = 12, q, year }: { page?: number; limit?: number; q?: string; year?: number } = {}) => {
   const payload = await getPayloadClient()
-  return payload.find({ collection: 'sermons', sort: '-date', page, limit, depth: 0 })
+  const and: Where[] = [...yearRange(year)]
+  if (q) and.push({ or: [{ title: { like: q } }, { preacher: { like: q } }, { passage: { like: q } }] })
+  return payload.find({ collection: 'sermons', sort: '-date', page, limit, depth: 0, where: and.length ? { and } : undefined })
+})
+
+/** Years that have at least one item, newest first (for filter chips). */
+export const getYears = cache(async (collection: 'sermons' | 'albums') => {
+  const payload = await getPayloadClient()
+  const res = await payload.find({ collection, limit: 2000, pagination: false, depth: 0, select: { date: true } })
+  return [...new Set(res.docs.map((d) => new Date(d.date).getUTCFullYear()))].sort((a, b) => b - a)
 })
 
 export const getFeaturedSermons = cache(async () => {
@@ -65,9 +87,10 @@ export const getFeaturedSermons = cache(async () => {
   return (await payload.find({ collection: 'sermons', sort: '-date', limit: 3, depth: 0 })).docs
 })
 
-export const getAlbums = cache(async () => {
+export const getAlbums = cache(async (year?: number) => {
   const payload = await getPayloadClient()
-  const res = await payload.find({ collection: 'albums', sort: '-date', limit: 100, depth: 1, pagination: false })
+  const and = yearRange(year)
+  const res = await payload.find({ collection: 'albums', sort: '-date', limit: 200, depth: 1, pagination: false, where: and.length ? { and } : undefined })
   return res.docs
 })
 

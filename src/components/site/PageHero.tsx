@@ -2,10 +2,13 @@ import Link from 'next/link'
 import type { ReactNode } from 'react'
 
 import { Reveal } from '@/components/motion/Reveal'
+import { WordReveal } from '@/components/motion/WordReveal'
 import type { MediaLike } from '@/lib/media'
 
+import { Curve } from './Curve'
 import { MediaImage } from './MediaImage'
 
+/** Deep purple page header with a red glow, an optional faint photo, and a word-by-word title. */
 export function PageHero({
   title,
   intro,
@@ -13,6 +16,8 @@ export function PageHero({
   image,
   crumbs = [],
   children,
+  className = '',
+  curve = true,
 }: {
   title: string
   intro?: string | null
@@ -20,17 +25,18 @@ export function PageHero({
   image?: MediaLike
   crumbs?: { label: string; href: string }[]
   children?: ReactNode
+  className?: string
+  curve?: boolean
 }) {
   const hasImage = Boolean(image && typeof image === 'object')
   return (
-    <section className={`page-hero${hasImage ? ' page-hero--image' : ''}`}>
+    <section className={`page-hero ${className}`}>
       {hasImage ? (
         <div className="page-hero__bg">
           <MediaImage media={image} priority sizes="100vw" />
         </div>
-      ) : (
-        <div className="page-hero__arc" aria-hidden="true" />
-      )}
+      ) : null}
+      <div className="page-hero__rings" aria-hidden="true" />
       <div className="container">
         <Reveal>
           <nav className="breadcrumb" aria-label="Breadcrumb">
@@ -44,12 +50,17 @@ export function PageHero({
             <span aria-hidden="true">/</span>
             <span aria-current="page">{title}</span>
           </nav>
-          {eyebrow ? <span className={`eyebrow${hasImage ? ' eyebrow--light' : ''}`}>{eyebrow}</span> : null}
-          <h1>{title}</h1>
-          {intro ? <p>{intro}</p> : null}
-          {children}
+          {eyebrow ? <span className="eyebrow eyebrow--light">{eyebrow}</span> : null}
         </Reveal>
+        <WordReveal text={title} accentLast light />
+        {intro ? (
+          <Reveal delay={0.25}>
+            <p>{intro}</p>
+          </Reveal>
+        ) : null}
+        {children}
       </div>
+      {curve ? <Curve position="bottom" color="#fff" /> : null}
     </section>
   )
 }

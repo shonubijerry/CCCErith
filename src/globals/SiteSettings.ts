@@ -43,23 +43,7 @@ export const SiteSettings: GlobalConfig = {
           label: 'Giving',
           fields: [
             { name: 'givingIntro', type: 'textarea' },
-            {
-              name: 'bank',
-              type: 'group',
-              label: 'Bank transfer',
-              fields: [
-                { name: 'accountName', type: 'text' },
-                {
-                  type: 'row',
-                  fields: [
-                    { name: 'sortCode', type: 'text' },
-                    { name: 'accountNumber', type: 'text' },
-                  ],
-                },
-                { name: 'reference', type: 'text', admin: { description: 'Suggested payment reference, e.g. "Tithe", "Offering".' } },
-              ],
-            },
-            { name: 'paypalUrl', label: 'PayPal donate link', type: 'text' },
+            { name: 'paypalUrl', label: 'PayPal donate link', type: 'text', admin: { description: 'Until this is filled in, the Give page shows "Online giving coming soon".' } },
             { name: 'inPersonText', label: 'Giving in person', type: 'textarea' },
           ],
         },

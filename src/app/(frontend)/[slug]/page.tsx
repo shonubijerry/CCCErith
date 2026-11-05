@@ -2,15 +2,12 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
-import { Parallax } from '@/components/motion/Parallax'
-import { Reveal, Stagger, StaggerItem } from '@/components/motion/Reveal'
+import { Reveal } from '@/components/motion/Reveal'
 import { Icon } from '@/components/site/Icon'
-import { MediaImage } from '@/components/site/MediaImage'
 import { PageHero } from '@/components/site/PageHero'
 import { RichText } from '@/components/site/RichText'
-import { SectionHead } from '@/components/site/SectionHead'
-import { asMedia } from '@/lib/media'
 import { getPageBySlug } from '@/lib/payload'
+import { headingsOf } from '@/lib/richtext'
 
 type Props = { params: Promise<{ slug: string }> }
 
@@ -20,88 +17,49 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return { title: page.title, description: page.intro ?? undefined }
 }
 
-export default async function GenericPage({ params }: Props) {
+/** Text pages (policies etc.): a comfortable reading layout with an "On this page" list. */
+export default async function TextPage({ params }: Props) {
   const { slug } = await params
   const page = await getPageBySlug(slug)
   if (!page) notFound()
-
-  const photos = (page.gallery ?? []).map(asMedia).filter(Boolean)
-  const highlights = page.highlights?.items ?? []
-  const isPolicy = /policy/.test(slug)
+  const toc = headingsOf(page.content)
+  const isSafeguarding = slug === 'safeguarding-policy'
 
   return (
     <>
-      <PageHero title={page.title} intro={page.intro} image={page.heroImage} />
-
+      <PageHero eyebrow={/policy/.test(slug) ? 'Policy' : undefined} title={page.title} intro={page.intro} image={page.heroImage} />
       <section className="section">
-        <div className={`container${photos.length ? '' : ' container--narrow'}`}>
-          {photos.length ? (
-            <div className="split">
+        <div className="container">
+          <div className="reading" style={toc.length < 2 ? { gridTemplateColumns: 'minmax(0, 760px)' } : undefined}>
+            {toc.length >= 2 ? (
+              <Reveal as="div" className="toc" direction="left">
+                <nav aria-label="On this page">
+                  <h2>On this page</h2>
+                  <ol>
+                    {toc.map((h) => (
+                      <li key={h.id} style={h.level === 3 ? { paddingLeft: 12 } : undefined}>
+                        <a href={`#${h.id}`}>{h.text}</a>
+                      </li>
+                    ))}
+                  </ol>
+                </nav>
+              </Reveal>
+            ) : null}
+            <div>
               <Reveal>
-                <RichText data={page.content} />
+                <RichText data={page.content} anchors />
               </Reveal>
-              <Reveal direction="right">
-                <Parallax className="split__media" distance={40}>
-                  <MediaImage media={photos[0]} sizes="(max-width: 900px) 100vw, 50vw" />
-                </Parallax>
-              </Reveal>
+              {isSafeguarding ? (
+                <Reveal className="concern">
+                  <h3>Report a concern</h3>
+                  <p>If you are worried about a child, young person or vulnerable adult, tell us straight away. If someone is in immediate danger, call 999.</p>
+                  <Link href="/contact" className="btn btn--white">Contact us confidentially <Icon name="arrow" /></Link>
+                </Reveal>
+              ) : null}
             </div>
-          ) : (
-            <Reveal>
-              <RichText data={page.content} />
-            </Reveal>
-          )}
+          </div>
         </div>
       </section>
-
-      {highlights.length ? (
-        <section className="section section--soft">
-          <div className="container">
-            <SectionHead center eyebrow="What guides us" title={page.highlights?.heading ?? ''} />
-            <Stagger className="highlights">
-              {highlights.map((h, i) => (
-                <StaggerItem key={h.id} className="highlight">
-                  <span className="highlight__num">{String(i + 1).padStart(2, '0')}</span>
-                  <h3>{h.title}</h3>
-                  {h.text ? <p>{h.text}</p> : null}
-                </StaggerItem>
-              ))}
-            </Stagger>
-          </div>
-        </section>
-      ) : null}
-
-      {photos.length > 1 ? (
-        <section className="section">
-          <div className="container">
-            <Stagger className="grid grid--3">
-              {photos.slice(1, 4).map((p) => (
-                <StaggerItem key={p!.id}>
-                  <Parallax className="split__media" distance={30}>
-                    <MediaImage media={p} sizes="(max-width: 700px) 100vw, 33vw" />
-                  </Parallax>
-                </StaggerItem>
-              ))}
-            </Stagger>
-          </div>
-        </section>
-      ) : null}
-
-      {!isPolicy ? (
-        <section className="section section--tight">
-          <div className="container">
-            <Reveal className="give-banner">
-              <span className="eyebrow eyebrow--light">New here?</span>
-              <h2>Join us this Sunday</h2>
-              <p>Come as you are. Worship with us at 33 Bexley Road, Erith — we would love to welcome you and your family.</p>
-              <div className="give-banner__actions">
-                <Link href="/events" className="btn">Service times <Icon name="arrow" /></Link>
-                <Link href="/contact" className="btn btn--ghost-light">Plan your visit</Link>
-              </div>
-            </Reveal>
-          </div>
-        </section>
-      ) : null}
     </>
   )
 }

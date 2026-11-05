@@ -103,59 +103,32 @@ const ALBUMS = [
 ]
 
 // ---------------------------------------------------------------- rich text pages (Markdown)
-const ABOUT = `
-## Who we are
-
+const WHO_WE_ARE = `
 At Celestial Church of Christ Noah’s Ark Erith Parish, we are a vibrant Christian church dedicated to sharing the love, truth, and salvation of Jesus Christ through worship, prayer, holiness, and compassionate service.
 
-As part of the worldwide Celestial Church of Christ under the spiritual leadership of Reverend Emmanuel Mobiyina Oshoffa, we are committed to helping people grow in faith, experience God’s presence, and live according to biblical principles.
+As part of the worldwide Celestial Church of Christ under the spiritual leadership of **Reverend Emmanuel Mobiyina Oshoffa**, we are committed to helping people grow in faith, experience God’s presence, and live according to biblical principles.
 
 We welcome people from all backgrounds into a warm and spiritually uplifting community where individuals and families can encounter God, build meaningful relationships, and deepen their relationship with Jesus Christ through discipleship, biblical teaching, and prayer.
-
-## Our story
-
-Celestial Church of Christ Noah’s Ark Erith Parish was established as part of the global mission of the Celestial Church of Christ to spread the Gospel and uphold the teachings of holiness and prayer.
-
-Over the years, the parish has grown into a vibrant spiritual home serving the people of Erith, Kent, and surrounding communities. The church has continued to impact lives through worship services, youth development programmes, charitable outreach initiatives, counselling support, and spiritual guidance.
-
-Today, the church proudly serves as the CCC Kent Regional Headquarters in the United Kingdom and continues to grow as a centre for faith, worship, healing, and community service.
-
-## Our core beliefs
-
-- The Holy Trinity — Father, Son, and Holy Spirit
-- Salvation through Jesus Christ
-- The authority and truth of the Holy Bible
-- Prayer, fasting, and holy living
-- Divine guidance through the Holy Spirit
-- Love, peace, righteousness, and compassion
-- Serving humanity through Christian outreach and charity
 `
 
-const COMMUNITY = `
+const COMMUNITY_TEXT = `
 At Celestial Church of Christ Noah’s Ark Erith Parish, we believe the church should positively impact lives beyond the walls of the sanctuary.
 
-We are committed to demonstrating the love of Christ through compassionate service and practical support.
-
-### Our outreach and community programmes include
-
-- Food bank and welfare support
-- Community outreach services
-- Prayer and counselling support
-- Youth empowerment programmes
-- Family support initiatives
-- Educational and mentoring activities
-- Charity and humanitarian assistance
-
-### Charity & regulatory information
+We are committed to demonstrating the love of Christ through compassionate service and practical support — from our monthly food bank to prayer, counselling, youth empowerment and family support.
 
 Celestial Church of Christ Erith Parish is a registered charity in England and Wales, committed to transparency and accountability in all our operations and ministry.
-
-- **Full legal name:** Celestial Church of Christ Erith Parish
-- **Charity registration no.:** 1134663
-- **Registered address:** 33 Bexley Road, Erith, Kent, DA8 1SH
-- **Governing document:** Church Constitution
-- **Trustees & governance:** view our current trustee body and official filings on the [UK Charity Commission Register](https://register-of-charities.charitycommission.gov.uk/en/charity-search/-/charity-details/4045961/contact-information).
 `
+
+const MINISTRY_PHOTOS: Record<string, string[]> = {
+  'prayer-prophetic-ministry': ['IMG_0551-scaled.jpeg', 'IMG_7431-scaled.jpg'],
+  'choir-worship-ministry': ['IMG_7858-scaled.jpg', 'IMG_9316-scaled.jpeg', '2-scaled.jpg'],
+  'youth-family-ministry': ['untitled-18-of-114-scaled.jpg', 'untitled-75-of-114-scaled.jpg', 'untitled-16-of-114-scaled.jpg'],
+  'women-fellowship': ['IMG_7256-1-scaled.jpg', '12-scaled.jpg', 'IMG_9550-scaled.jpeg'],
+  'men-fellowship': ['ccc_erith_parish_ministers-scaled.jpeg', 'IMG_7995-scaled.jpg'],
+  'evangelism-outreach-ministry': ['evangelism_1-scaled.jpeg', 'evangelism_3-scaled.jpeg', 'IMG_9656-scaled.jpeg'],
+  'ushering-hospitality-ministry': ['1N5A0058-scaled.jpeg', '1N5A0022-scaled.jpeg'],
+  'media-communications-ministry': ['IMG_7426-scaled.jpg', 'IMG_9230-scaled.jpg'],
+}
 
 const SAFEGUARDING = `
 ### Our safeguarding commitment
@@ -545,6 +518,9 @@ async function main() {
     media.set(file, doc.id)
   }
   log(`uploaded ${media.size} images`)
+  const videoPoster = await payload.create({ collection: 'media', data: { alt: 'A white dove flying above the clouds' }, filePath: path.join(IMG_DIR, 'dove-in-the-clouds-poster.webp'), overrideAccess: true })
+  const video = await payload.create({ collection: 'media', data: { alt: 'A white dove flying above the clouds' }, filePath: path.join(IMG_DIR, 'dove-in-the-clouds.mp4'), overrideAccess: true })
+  log('uploaded hero video')
   const m = (file: string) => {
     const id = media.get(file)
     if (!id) throw new Error(`Image not uploaded: ${file}`)
@@ -571,7 +547,6 @@ async function main() {
       tiktok: '',
       givingIntro:
         'Celestial Church of Christ Noah’s Ark Erith Parish is a registered UK charity committed to ministry, outreach, worship and community support. Your generous giving helps us continue serving God and supporting our local community.',
-      bank: { accountName: 'ACCOUNT NAME (to be confirmed)', sortCode: '00-00-00', accountNumber: '00000000', reference: 'Your name + Tithe / Offering' },
       paypalUrl: '',
       inPersonText: 'Bring your tithes and offerings to any of our services. Envelopes are available from the ushers.',
     },
@@ -579,14 +554,6 @@ async function main() {
 
   // Pages
   const pages = [
-    { title: 'About Us', slug: 'about-us', intro: 'A vibrant Christian family in Erith, sharing the love, truth and salvation of Jesus Christ.', heroImage: m('1N5A0072-scaled.jpeg'), content: md(ABOUT), gallery: [m('ccc_erith_parish-scaled.jpeg'), m('ccc_erith_parish_ministers-scaled.jpeg'), m('1N5A0093-scaled.jpeg'), m('1N5A9950-scaled.jpeg')], highlights: { heading: 'Our core values', items: [
-      { title: 'Holiness', text: 'Living according to God’s Word and Christian principles.' },
-      { title: 'Faith', text: 'Trusting God completely in every circumstance.' },
-      { title: 'Love', text: 'Demonstrating compassion, kindness, and care to all people.' },
-      { title: 'Unity', text: 'Building one body in Christ through fellowship and peace.' },
-      { title: 'Service', text: 'Supporting our church family and wider community through acts of kindness and outreach.' },
-    ] } },
-    { title: 'Community Service', slug: 'community-service', intro: 'Showing the love of Christ beyond the walls of the sanctuary.', content: md(COMMUNITY), gallery: [m('IMG_9656-scaled.jpeg'), m('evangelism_1-scaled.jpeg'), m('evangelism_3-scaled.jpeg'), m('IMG_8058-scaled.jpg')] },
     { title: 'Safeguarding Policy', slug: 'safeguarding-policy', intro: 'Keeping children, young people and vulnerable adults safe.', content: md(SAFEGUARDING) },
     { title: 'Privacy Policy', slug: 'privacy-policy', intro: 'How we collect, use and protect your personal information.', content: md(PRIVACY) },
     { title: 'Cookie Policy', slug: 'cookie-policy', intro: 'How our website uses cookies.', content: md(COOKIES) },
@@ -594,6 +561,74 @@ async function main() {
   ]
   for (const p of pages) await payload.create({ collection: 'pages', data: p, overrideAccess: true })
   log(`created ${pages.length} pages`)
+
+  await payload.updateGlobal({
+    slug: 'about-page',
+    overrideAccess: true,
+    data: {
+      intro: 'A vibrant Christian family in Erith, sharing the love, truth and salvation of Jesus Christ through worship, prayer, holiness and compassionate service.',
+      heroPhotos: [m('ccc_erith_parish-scaled.jpeg'), m('1N5A9960-scaled.jpeg'), m('1N5A0081-scaled.jpeg')],
+      whoHeading: 'Who we are',
+      whoText: md(WHO_WE_ARE),
+      whoPhotos: [m('1N5A0072-scaled.jpeg'), m('untitled-46-of-114-scaled.jpg'), m('IMG_9316-scaled.jpeg')],
+      quote: 'Raising a holy people devoted to God, His Word, and His Spirit.',
+      quoteCite: 'Our vision',
+      storyHeading: 'Our story',
+      storySteps: [
+        { label: 'Our beginning', title: 'Part of a global mission', text: 'Celestial Church of Christ Noah’s Ark Erith Parish was established as part of the global mission of the Celestial Church of Christ to spread the Gospel and uphold the teachings of holiness and prayer.', image: m('ccc_erith_parish_ministers-scaled.jpeg') },
+        { label: 'Growing together', title: 'A spiritual home in Erith', text: 'Over the years, the parish has grown into a vibrant spiritual home serving the people of Erith, Kent, and surrounding communities — impacting lives through worship services, youth development programmes, charitable outreach, counselling support, and spiritual guidance.', image: m('IMG_9285-scaled.jpg') },
+        { label: 'Today', title: 'CCC Kent Regional Headquarters UK', text: 'Today, the church proudly serves as the CCC Kent Regional Headquarters in the United Kingdom and continues to grow as a centre for faith, worship, healing, and community service.', image: m('1N5A9950-scaled.jpeg') },
+      ],
+      beliefsHeading: 'Our core beliefs',
+      beliefs: [
+        { title: 'The Holy Trinity — Father, Son, and Holy Spirit', icon: 'sparkle' },
+        { title: 'Salvation through Jesus Christ', icon: 'cross' },
+        { title: 'The authority and truth of the Holy Bible', icon: 'book' },
+        { title: 'Prayer, fasting, and holy living', icon: 'flame' },
+        { title: 'Divine guidance through the Holy Spirit', icon: 'dove' },
+        { title: 'Love, peace, righteousness, and compassion', icon: 'heart' },
+        { title: 'Serving humanity through Christian outreach and charity', icon: 'hand' },
+      ],
+      valuesHeading: 'Our core values',
+      values: [
+        { title: 'Holiness', text: 'Living according to God’s Word and Christian principles.' },
+        { title: 'Faith', text: 'Trusting God completely in every circumstance.' },
+        { title: 'Love', text: 'Demonstrating compassion, kindness, and care to all people.' },
+        { title: 'Unity', text: 'Building one body in Christ through fellowship and peace.' },
+        { title: 'Service', text: 'Supporting our church family and wider community through acts of kindness and outreach.' },
+      ],
+      showLeaders: true,
+      leadersText: 'Our parish is led by ordained ministers and dedicated church workers committed to spiritual leadership, accountability, integrity, and service.',
+    },
+  })
+
+  await payload.updateGlobal({
+    slug: 'community-page',
+    overrideAccess: true,
+    data: {
+      intro: 'Showing the love of Christ beyond the walls of the sanctuary.',
+      text: md(COMMUNITY_TEXT),
+      photos: [m('IMG_9656-scaled.jpeg'), m('evangelism_1-scaled.jpeg'), m('evangelism_3-scaled.jpeg'), m('IMG_8058-scaled.jpg')],
+      programmesHeading: 'Our outreach and community programmes',
+      programmes: [
+        { title: 'Food bank and welfare support', icon: 'basket' },
+        { title: 'Community outreach services', icon: 'globe' },
+        { title: 'Prayer and counselling support', icon: 'chat' },
+        { title: 'Youth empowerment programmes', icon: 'sparkle' },
+        { title: 'Family support initiatives', icon: 'home' },
+        { title: 'Educational and mentoring activities', icon: 'school' },
+        { title: 'Charity and humanitarian assistance', icon: 'hand' },
+      ],
+      charity: {
+        legalName: 'Celestial Church of Christ Erith Parish',
+        number: '1134663',
+        address: '33 Bexley Road, Erith, Kent, DA8 1SH',
+        governingDocument: 'Church Constitution',
+        registerUrl: 'https://register-of-charities.charitycommission.gov.uk/en/charity-search/-/charity-details/4045961/contact-information',
+      },
+    },
+  })
+  log('about + community pages set')
 
   // Home page
   await payload.updateGlobal({
@@ -603,7 +638,14 @@ async function main() {
       heroEyebrow: 'Join us this Sunday',
       heroHeading: 'You belong here',
       heroText: 'Welcome to Celestial Church of Christ Noah’s Ark Erith Parish — a home of worship, prayer, holiness and spiritual transformation.',
-      heroImage: m('1N5A9960-scaled.jpeg'),
+      heroSlides: [
+        { media: video.id, poster: videoPoster.id, focus: 'center' },
+        { media: m('1N5A9960-scaled.jpeg'), focus: 'center' },
+        { media: m('1N5A0072-scaled.jpeg'), eyebrow: 'CCC Kent Regional Headquarters UK', heading: 'One family, one faith', text: 'Worship with us every Sunday from 10am at 33 Bexley Road, Erith.', buttonLabel: 'Service times', buttonHref: '/events', focus: 'center' },
+        { media: m('IMG_9765-scaled.jpg'), eyebrow: 'Praise & worship', heading: 'Lift your voice with us', buttonLabel: 'Our ministries', buttonHref: '/ministries', focus: 'center' },
+      ],
+      heroSettings: { autoplay: true, pauseOnHover: true, showArrows: true, showDots: true, interval: 7, transition: 'fade', speed: 'normal', overlay: 'medium' },
+      stripPhotos: ['IMG_7858-scaled.jpg', 'untitled-18-of-114-scaled.jpg', '1N5A9931-scaled.jpeg', 'IMG_9230-scaled.jpg', '1N5A0081-scaled.jpeg', 'untitled-75-of-114-scaled.jpg', 'IMG_9746-scaled.jpg', '1N5A0157-scaled.jpeg', 'IMG_9316-scaled.jpeg', '12-scaled.jpg', 'IMG_7547-scaled.jpg', '1N5A0003-scaled.jpeg'].map(m),
       heroPrimary: { label: 'Plan your visit', href: '/contact' },
       heroSecondary: { label: 'Service times', href: '/events' },
       welcomeHeading: 'Welcome to CCC Noah’s Ark Erith Parish',
@@ -649,6 +691,7 @@ async function main() {
         image: m(x.image),
         excerpt: x.excerpt,
         body: md(x.body),
+        gallery: (MINISTRY_PHOTOS[x.slug] ?? []).map(m),
         meetingTimes: x.times.map(([label, when]) => ({ label, when })),
         location: 'Church premises',
       },

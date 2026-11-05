@@ -107,10 +107,14 @@ export interface Config {
   fallbackLocale: null;
   globals: {
     'home-page': HomePage;
+    'about-page': AboutPage;
+    'community-page': CommunityPage;
     'site-settings': SiteSetting;
   };
   globalsSelect: {
     'home-page': HomePageSelect<false> | HomePageSelect<true>;
+    'about-page': AboutPageSelect<false> | AboutPageSelect<true>;
+    'community-page': CommunityPageSelect<false> | CommunityPageSelect<true>;
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
   };
   locale: null;
@@ -142,7 +146,7 @@ export interface UserAuthOperations {
   };
 }
 /**
- * Text pages such as About Us, Community Service and the policies.
+ * Text pages such as the policies and the Our Team introduction. (About Us, Community Service and the Home page have their own sections.)
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "pages".
@@ -198,7 +202,7 @@ export interface Page {
 export interface Media {
   id: number;
   /**
-   * Describe the photo in a few words, for screen readers and search engines.
+   * Describe the photo or video in a few words, for screen readers and search engines. Keep videos short (under 15 seconds) and small (under 5 MB).
    */
   alt: string;
   _objectKey?: string | null;
@@ -353,6 +357,10 @@ export interface Ministry {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * Up to 3 extra photos shown on the ministry page.
+   */
+  gallery?: (number | Media)[] | null;
   meetingTimes?:
     | {
         label: string;
@@ -675,6 +683,7 @@ export interface MinistriesSelect<T extends boolean = true> {
   image?: T;
   excerpt?: T;
   body?: T;
+  gallery?: T;
   meetingTimes?:
     | T
     | {
@@ -833,7 +842,6 @@ export interface HomePage {
   heroEyebrow?: string | null;
   heroHeading: string;
   heroText?: string | null;
-  heroImage: number | Media;
   heroPrimary?: {
     label?: string | null;
     /**
@@ -848,6 +856,51 @@ export interface HomePage {
      */
     href?: string | null;
   };
+  /**
+   * Drag to reorder. Each slide shows an image or a short video.
+   */
+  heroSlides?:
+    | {
+        media: number | Media;
+        /**
+         * For videos: shown while the video loads and on phones in data-saver mode.
+         */
+        poster?: (number | null) | Media;
+        eyebrow?: string | null;
+        /**
+         * Leave blank to use the default heading.
+         */
+        heading?: string | null;
+        text?: string | null;
+        buttonLabel?: string | null;
+        buttonHref?: string | null;
+        /**
+         * Which part of the picture to keep visible on narrow screens.
+         */
+        focus?: ('center' | 'top' | 'bottom' | 'left' | 'right') | null;
+        id?: string | null;
+      }[]
+    | null;
+  heroSettings?: {
+    autoplay?: boolean | null;
+    pauseOnHover?: boolean | null;
+    showArrows?: boolean | null;
+    showDots?: boolean | null;
+    /**
+     * Video slides always play to the end.
+     */
+    interval?: number | null;
+    transition?: ('fade' | 'slide' | 'wipe') | null;
+    speed?: ('slow' | 'normal' | 'fast') | null;
+    /**
+     * Darker keeps text readable on bright pictures.
+     */
+    overlay?: ('light' | 'medium' | 'strong') | null;
+  };
+  /**
+   * Photos that scroll slowly across the home page. 8–14 works best. Leave empty to hide.
+   */
+  stripPhotos?: (number | Media)[] | null;
   welcomeHeading?: string | null;
   welcomeText?: string | null;
   welcomeImages?: (number | Media)[] | null;
@@ -891,6 +944,142 @@ export interface HomePage {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "about-page".
+ */
+export interface AboutPage {
+  id: number;
+  intro: string;
+  heroPhotos?: (number | Media)[] | null;
+  whoHeading?: string | null;
+  whoText: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  whoPhotos?: (number | Media)[] | null;
+  quote?: string | null;
+  quoteCite?: string | null;
+  storyHeading?: string | null;
+  /**
+   * Shown as a timeline, alternating left and right.
+   */
+  storySteps?:
+    | {
+        label?: string | null;
+        title: string;
+        text: string;
+        image?: (number | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
+  beliefsHeading?: string | null;
+  beliefs?:
+    | {
+        title: string;
+        icon?:
+          | (
+              | 'cross'
+              | 'dove'
+              | 'book'
+              | 'flame'
+              | 'heart'
+              | 'hand'
+              | 'users'
+              | 'sparkle'
+              | 'globe'
+              | 'shield'
+              | 'basket'
+              | 'school'
+              | 'home'
+              | 'chat'
+            )
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  valuesHeading?: string | null;
+  values?:
+    | {
+        title: string;
+        text?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  showLeaders?: boolean | null;
+  leadersText?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "community-page".
+ */
+export interface CommunityPage {
+  id: number;
+  intro: string;
+  text: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  photos?: (number | Media)[] | null;
+  programmesHeading?: string | null;
+  programmes?:
+    | {
+        title: string;
+        icon?:
+          | (
+              | 'cross'
+              | 'dove'
+              | 'book'
+              | 'flame'
+              | 'heart'
+              | 'hand'
+              | 'users'
+              | 'sparkle'
+              | 'globe'
+              | 'shield'
+              | 'basket'
+              | 'school'
+              | 'home'
+              | 'chat'
+            )
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  charity?: {
+    legalName?: string | null;
+    number?: string | null;
+    address?: string | null;
+    governingDocument?: string | null;
+    registerUrl?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "site-settings".
  */
 export interface SiteSetting {
@@ -915,15 +1104,9 @@ export interface SiteSetting {
   youtube?: string | null;
   tiktok?: string | null;
   givingIntro?: string | null;
-  bank?: {
-    accountName?: string | null;
-    sortCode?: string | null;
-    accountNumber?: string | null;
-    /**
-     * Suggested payment reference, e.g. "Tithe", "Offering".
-     */
-    reference?: string | null;
-  };
+  /**
+   * Until this is filled in, the Give page shows "Online giving coming soon".
+   */
   paypalUrl?: string | null;
   inPersonText?: string | null;
   updatedAt?: string | null;
@@ -937,7 +1120,6 @@ export interface HomePageSelect<T extends boolean = true> {
   heroEyebrow?: T;
   heroHeading?: T;
   heroText?: T;
-  heroImage?: T;
   heroPrimary?:
     | T
     | {
@@ -950,6 +1132,32 @@ export interface HomePageSelect<T extends boolean = true> {
         label?: T;
         href?: T;
       };
+  heroSlides?:
+    | T
+    | {
+        media?: T;
+        poster?: T;
+        eyebrow?: T;
+        heading?: T;
+        text?: T;
+        buttonLabel?: T;
+        buttonHref?: T;
+        focus?: T;
+        id?: T;
+      };
+  heroSettings?:
+    | T
+    | {
+        autoplay?: T;
+        pauseOnHover?: T;
+        showArrows?: T;
+        showDots?: T;
+        interval?: T;
+        transition?: T;
+        speed?: T;
+        overlay?: T;
+      };
+  stripPhotos?: T;
   welcomeHeading?: T;
   welcomeText?: T;
   welcomeImages?: T;
@@ -988,6 +1196,79 @@ export interface HomePageSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "about-page_select".
+ */
+export interface AboutPageSelect<T extends boolean = true> {
+  intro?: T;
+  heroPhotos?: T;
+  whoHeading?: T;
+  whoText?: T;
+  whoPhotos?: T;
+  quote?: T;
+  quoteCite?: T;
+  storyHeading?: T;
+  storySteps?:
+    | T
+    | {
+        label?: T;
+        title?: T;
+        text?: T;
+        image?: T;
+        id?: T;
+      };
+  beliefsHeading?: T;
+  beliefs?:
+    | T
+    | {
+        title?: T;
+        icon?: T;
+        id?: T;
+      };
+  valuesHeading?: T;
+  values?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        id?: T;
+      };
+  showLeaders?: T;
+  leadersText?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "community-page_select".
+ */
+export interface CommunityPageSelect<T extends boolean = true> {
+  intro?: T;
+  text?: T;
+  photos?: T;
+  programmesHeading?: T;
+  programmes?:
+    | T
+    | {
+        title?: T;
+        icon?: T;
+        id?: T;
+      };
+  charity?:
+    | T
+    | {
+        legalName?: T;
+        number?: T;
+        address?: T;
+        governingDocument?: T;
+        registerUrl?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "site-settings_select".
  */
 export interface SiteSettingsSelect<T extends boolean = true> {
@@ -1005,14 +1286,6 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   youtube?: T;
   tiktok?: T;
   givingIntro?: T;
-  bank?:
-    | T
-    | {
-        accountName?: T;
-        sortCode?: T;
-        accountNumber?: T;
-        reference?: T;
-      };
   paypalUrl?: T;
   inPersonText?: T;
   updatedAt?: T;

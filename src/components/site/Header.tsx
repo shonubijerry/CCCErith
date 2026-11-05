@@ -13,7 +13,6 @@ const isActive = (pathname: string, href: string) => (href === '/' ? pathname ==
 
 export function Header({ email, phone }: { email?: string | null; phone?: string | null }) {
   const pathname = usePathname()
-  const overHero = pathname === '/'
   const [scrolled, setScrolled] = useState(false)
   // The menu belongs to the page it was opened on, so navigating closes it automatically.
   const [openOn, setOpenOn] = useState<string | null>(null)
@@ -35,7 +34,7 @@ export function Header({ email, phone }: { email?: string | null; phone?: string
     return () => window.removeEventListener('keydown', onKey)
   }, [open])
 
-  const cls = ['header', overHero && 'header--over-hero', scrolled && 'header--scrolled'].filter(Boolean).join(' ')
+  const cls = ['header', scrolled && 'header--scrolled'].filter(Boolean).join(' ')
 
   return (
     <>

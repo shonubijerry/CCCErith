@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 
-import { Stagger, StaggerItem } from '@/components/motion/Reveal'
+import { Reveal, Stagger, StaggerItem } from '@/components/motion/Reveal'
+import { CalendarLinks } from '@/components/site/CalendarLinks'
 import { Icon } from '@/components/site/Icon'
-import { MediaImage } from '@/components/site/MediaImage'
 import { PageHero } from '@/components/site/PageHero'
 import { SectionHead } from '@/components/site/SectionHead'
 import { capitalise, formatDate, formatTimeOfDate, timeRange } from '@/lib/format'
@@ -21,11 +21,12 @@ export default async function EventsPage() {
 
   return (
     <>
-      <PageHero eyebrow="Come as you are" title="Services & Events" intro="Join us for worship, prayer and fellowship throughout the week at 33 Bexley Road, Erith. All times are UK time." />
-
-      <section className="section">
-        <div className="container">
-          <SectionHead eyebrow="Every week" title="Weekly timetable" />
+      <PageHero eyebrow="Come as you are" title="Services & Events" intro="Join us for worship, prayer and fellowship throughout the week at 33 Bexley Road, Erith. All times are UK time." className="band">
+        <div className="mt-lg">
+          <Reveal>
+            <span className="eyebrow eyebrow--light">Every week</span>
+            <h2 style={{ marginBottom: 32 }}>Weekly <em className="grad-text-light">timetable</em></h2>
+          </Reveal>
           <Stagger className="schedule">
             {days.map(({ day, items }) => (
               <StaggerItem key={day} className={`schedule__day${day === today ? ' schedule__day--today' : ''}`}>
@@ -47,37 +48,38 @@ export default async function EventsPage() {
             ))}
           </Stagger>
         </div>
-      </section>
+      </PageHero>
 
-      <section className="section section--soft">
+      <section className="section">
         <div className="container">
-          <SectionHead eyebrow="Mark your calendar" title="Special events" />
+          <SectionHead eyebrow="Mark your calendar" title={<>Special <em className="grad-text">events</em></>} />
           {events.length ? (
-            <Stagger className="grid grid--3">
+            <Stagger className="event-list">
               {events.map((e) => (
-                <StaggerItem key={e.id}>
-                  <article className="card">
-                    <div className="card__media">
-                      {e.image ? <MediaImage media={e.image} sizes="(max-width: 700px) 100vw, 33vw" /> : null}
+                <StaggerItem key={e.id} className="event-row">
+                  <div className="date-block">
+                    <strong>{formatDate(e.startDate, { day: 'numeric' })}</strong>
+                    <small>{formatDate(e.startDate, { month: 'short', year: 'numeric' })}</small>
+                  </div>
+                  <div>
+                    <div className="event-row__meta">
+                      <span><Icon name="clock" size={14} />{formatDate(e.startDate, { weekday: 'long' })} · {formatTimeOfDate(e.startDate)}</span>
+                      {e.venue ? <span><Icon name="pin" size={14} />{e.venue}</span> : null}
                     </div>
-                    <div className="card__body">
-                      <span className="card__kicker">
-                        {formatDate(e.startDate, { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' })} · {formatTimeOfDate(e.startDate)}
-                      </span>
-                      <h3 className="card__title">
-                        <Link href={`/events/${e.slug}`} className="card__link">{e.title}</Link>
-                      </h3>
-                      {e.summary ? <p className="card__text">{e.summary}</p> : null}
-                    </div>
-                  </article>
+                    <h3><Link href={`/events/${e.slug}`}>{e.title}</Link></h3>
+                    {e.summary ? <p>{e.summary}</p> : null}
+                  </div>
+                  <div className="event-row__actions">
+                    <CalendarLinks event={e} compact />
+                  </div>
                 </StaggerItem>
               ))}
             </Stagger>
           ) : (
-            <div className="empty">
+            <Reveal className="empty">
               <h3>No special events just now</h3>
               <p>Our weekly services continue as usual. Check back soon for programmes, anniversaries and celebrations.</p>
-            </div>
+            </Reveal>
           )}
         </div>
       </section>

@@ -27,7 +27,7 @@ export default async function SermonPage({ params }: Props) {
     <section className="section" style={{ paddingTop: 'calc(var(--header-h) + 56px)' }}>
       <div className="container container--narrow">
         <Reveal>
-          <nav className="breadcrumb" aria-label="Breadcrumb">
+          <nav className="breadcrumb breadcrumb--dark" aria-label="Breadcrumb">
             <Link href="/">Home</Link><span aria-hidden="true">/</span><Link href="/sermons">Sermons</Link>
           </nav>
           <span className="eyebrow">Sermon</span>

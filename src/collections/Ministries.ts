@@ -13,6 +13,7 @@ export const Ministries: CollectionConfig = {
     { name: 'image', type: 'upload', relationTo: 'media', required: true },
     { name: 'excerpt', type: 'textarea', required: true, admin: { description: 'Short description for the ministry cards.' } },
     { name: 'body', label: 'Full description', type: 'richText' },
+    { name: 'gallery', label: 'More photos (optional)', type: 'upload', relationTo: 'media', hasMany: true, admin: { description: 'Up to 3 extra photos shown on the ministry page.' } },
     {
       name: 'meetingTimes',
       type: 'array',

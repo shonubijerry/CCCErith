@@ -4,7 +4,17 @@ Website and content admin for **Celestial Church of Christ Noah’s Ark Erith Pa
 
 - **Site:** Next.js 16 + [Payload CMS 3](https://payloadcms.com), running on **Cloudflare Workers** (via OpenNext)
 - **Database:** Cloudflare D1 · **Images:** Cloudflare R2 · **Email:** Cloudflare Email Service
-- **Admin:** `/admin` — editors manage sermons, events, weekly services, ministries, gallery albums, the team page, text pages, the home page and site settings.
+- **Admin:** `/admin` — editors manage the home page (hero carousel slides + settings, photo strip), the About Us and
+  Community Service pages, sermons, special events, weekly services, ministries, gallery albums, the team page,
+  policy pages and site settings (contact details, social links, PayPal link).
+
+### Hero carousel
+
+*Home page → Hero carousel* holds the slides (image or short video, optional heading/text/button each) and the
+carousel settings: autoplay, seconds per slide, transition (crossfade + zoom / slide / curtain wipe), speed, arrows,
+dots, pause-on-hover and overlay darkness. Videos play muted and move on when they finish; visitors with
+“reduce motion” or phone data-saver on see the video’s cover image instead. Keep videos short (≈10–15s), 720p,
+without audio — e.g. `ffmpeg -i in.mp4 -an -vf scale=1280:-2 -c:v libx264 -crf 27 -movflags +faststart out.mp4`.
 
 ## Local development
 
@@ -25,7 +35,8 @@ Checks: `pnpm lint`, `npx tsc --noEmit`, `pnpm test:int` (backup logic), `pnpm t
 ### Content import from the old WordPress site
 
 `scripts/wp-export/` (git-ignored) holds the files pulled from the old site. `scripts/prepare-images.mjs`
-shrinks the photos to WebP, and `scripts/seed.ts` loads pages, ministries, the weekly timetable, the team,
+shrinks the photos to WebP (the dove hero video was re-encoded with ffmpeg into the same folder), and
+`scripts/seed.ts` loads the home carousel, About/Community pages, policies, ministries, the weekly timetable, the team,
 gallery albums and settings. It refuses to run on a database that already has content unless `SEED_RESET=1`
 (which wipes content but keeps logins).
 
@@ -108,7 +119,8 @@ D1 also keeps its own 30-day point-in-time history (`wrangler d1 time-travel`).
 | --- | --- |
 | `src/collections`, `src/globals` | Content types editors manage |
 | `src/app/(frontend)` | Public pages · `globals.css` holds the design system (brand colours at the top) |
-| `src/components` | UI and animation components |
+| `src/components/site` | Page UI (hero carousel, cards, headers…) |
+| `src/components/motion` | Animations: reveals, word-by-word headings, image masks, parallax, tilt, timeline, photo strip — all respect “reduce motion” |
 | `src/lib/backup.ts`, `custom-worker.ts` | Nightly backups |
 | `src/lib/cloudflareEmail.ts` | Email via Cloudflare Email Service |
 | `scripts/` | WordPress import (`seed.ts`, `prepare-images.mjs`) |

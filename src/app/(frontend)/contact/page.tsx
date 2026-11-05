@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 
-import { Reveal } from '@/components/motion/Reveal'
-import { Icon } from '@/components/site/Icon'
+import { Reveal, Stagger, StaggerItem } from '@/components/motion/Reveal'
+import { WordReveal } from '@/components/motion/WordReveal'
+import { Icon, type IconName } from '@/components/site/Icon'
 import { PageHero } from '@/components/site/PageHero'
 import { getSiteSettings } from '@/lib/payload'
 
@@ -14,39 +15,37 @@ const MAP = 'https://www.openstreetmap.org/export/embed.html?bbox=0.1715%2C51.47
 
 export default async function ContactPage() {
   const s = await getSiteSettings()
+  const cards: { icon: IconName; label: string; value: string; href?: string; external?: boolean }[] = [
+    { icon: 'pin', label: 'Visit us', value: s.address.replace(/\n/g, ', '), href: s.mapsUrl ?? undefined, external: true },
+    { icon: 'mail', label: 'Email', value: s.email, href: `mailto:${s.email}` },
+    ...(s.phone ? [{ icon: 'phone' as const, label: 'Phone', value: s.phone, href: `tel:${s.phone.replace(/\s/g, '')}` }] : []),
+    ...(s.officeHours ? [{ icon: 'clock' as const, label: 'Open', value: s.officeHours }] : []),
+  ]
+
   return (
     <>
-      <PageHero eyebrow="Plan your visit" title="Get in touch" intro="We would love to hear from you — whether you are planning your first visit, need prayer, or have a question." />
-      <section className="section">
-        <div className="container contact-grid">
+      <PageHero eyebrow="Plan your visit" title="Get in touch" intro="We would love to hear from you — whether you are planning your first visit, need prayer, or have a question." className="page-hero--tall" curve={false} />
+      <section className="section" style={{ paddingTop: 0 }}>
+        <div className="container contact-overlap">
+          <Stagger className="contact-cards">
+            {cards.map((c) => (
+              <StaggerItem key={c.label} className="contact-card">
+                <span className="contact-list__icon"><Icon name={c.icon} size={22} /></span>
+                <small>{c.label}</small>
+                {c.href ? (
+                  <a href={c.href} target={c.external ? '_blank' : undefined} rel={c.external ? 'noopener noreferrer' : undefined}>{c.value}</a>
+                ) : (
+                  <span>{c.value}</span>
+                )}
+              </StaggerItem>
+            ))}
+          </Stagger>
+        </div>
+        <div className="container contact-grid mt-lg">
           <Reveal direction="left">
-            <span className="eyebrow">Contact information</span>
-            <h2>Visit us in Erith</h2>
-            <ul className="contact-list">
-              <li>
-                <span className="contact-list__icon"><Icon name="pin" size={22} /></span>
-                <div>
-                  <small>Address</small>
-                  {s.mapsUrl ? <a href={s.mapsUrl} target="_blank" rel="noopener noreferrer" style={{ whiteSpace: 'pre-line' }}>{s.address}</a> : <span style={{ whiteSpace: 'pre-line' }}>{s.address}</span>}
-                </div>
-              </li>
-              <li>
-                <span className="contact-list__icon"><Icon name="mail" size={22} /></span>
-                <div><small>Email</small><a href={`mailto:${s.email}`}>{s.email}</a></div>
-              </li>
-              {s.phone ? (
-                <li>
-                  <span className="contact-list__icon"><Icon name="phone" size={22} /></span>
-                  <div><small>Phone</small><a href={`tel:${s.phone.replace(/\s/g, '')}`}>{s.phone}</a></div>
-                </li>
-              ) : null}
-              {s.officeHours ? (
-                <li>
-                  <span className="contact-list__icon"><Icon name="clock" size={22} /></span>
-                  <div><small>Open</small>{s.officeHours}</div>
-                </li>
-              ) : null}
-            </ul>
+            <span className="eyebrow">Find us</span>
+            <WordReveal as="h2" text="Visit us in Erith" accentLast />
+            <p style={{ color: 'var(--muted)' }}>Our church is on Bexley Road in Northumberland Heath, a short bus ride from Erith and Bexleyheath stations.</p>
             <div className="map">
               <iframe src={MAP} title="Map showing 33 Bexley Road, Erith" loading="lazy" />
             </div>

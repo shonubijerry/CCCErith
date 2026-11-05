@@ -18,6 +18,8 @@ import { Sermons } from './collections/Sermons'
 import { Departments, TeamMembers } from './collections/Team'
 import { Users } from './collections/Users'
 import { WeeklyServices } from './collections/WeeklyServices'
+import { AboutPage } from './globals/AboutPage'
+import { CommunityPage } from './globals/CommunityPage'
 import { HomePage } from './globals/HomePage'
 import { SiteSettings } from './globals/SiteSettings'
 import { cloudflareEmailAdapter, type EmailBinding } from './lib/cloudflareEmail'
@@ -101,7 +103,7 @@ export default buildConfig({
     ContactMessages,
     Users,
   ],
-  globals: [HomePage, SiteSettings],
+  globals: [HomePage, AboutPage, CommunityPage, SiteSettings],
   email: cloudflareEmailAdapter(() => (cloudflare.env as unknown as { EMAIL?: EmailBinding }).EMAIL),
   graphQL: { disable: true },
   editor: lexicalEditor(),

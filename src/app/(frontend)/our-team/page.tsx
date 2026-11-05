@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 
 import { Reveal, Stagger, StaggerItem } from '@/components/motion/Reveal'
+import { Curve } from '@/components/site/Curve'
+import { DeptAccordion } from '@/components/site/DeptAccordion'
 import { MediaImage } from '@/components/site/MediaImage'
 import { PageHero } from '@/components/site/PageHero'
 import { RichText } from '@/components/site/RichText'
@@ -42,7 +44,8 @@ export default async function TeamPage() {
       ) : null}
 
       {featured.length ? (
-        <section className="section section--tight">
+        <section className="section band">
+          <Curve position="top" color="#fff" />
           <div className="container">
             <Stagger className="leaders">
               {featured.map((m) => (
@@ -58,33 +61,30 @@ export default async function TeamPage() {
               ))}
             </Stagger>
           </div>
+          <Curve position="bottom" color="#fff" />
         </section>
       ) : null}
 
       <section className="section">
         <div className="container">
-          {groups.map(({ dept, people }) => (
-            <div key={dept.id} className="dept">
-              <Reveal>
-                <h3>
-                  {dept.name}
-                  <span className="dept__count">{people.length} {people.length === 1 ? 'member' : 'members'}</span>
-                </h3>
-              </Reveal>
-              <Stagger className="members">
-                {people.map((m) => (
-                  <StaggerItem key={m.id} className="member">
-                    <span className="member__avatar" style={{ position: 'relative' }}>
-                      {m.photo ? <MediaImage media={m.photo} sizes="52px" /> : initials(m.name)}
-                    </span>
-                    <span>
-                      <span className="member__name" style={{ display: 'block' }}>{fullName(m)}</span>
-                      <span className="member__role">{m.role}</span>
-                    </span>
-                  </StaggerItem>
-                ))}
-              </Stagger>
-            </div>
+          {groups.map(({ dept, people }, i) => (
+            <Reveal key={dept.id}>
+              <DeptAccordion title={dept.name} count={people.length} defaultOpen={i === 0}>
+                <Stagger className="members">
+                  {people.map((m) => (
+                    <StaggerItem key={m.id} className="member">
+                      <span className="member__avatar" style={{ position: 'relative' }}>
+                        {m.photo ? <MediaImage media={m.photo} sizes="52px" /> : initials(m.name)}
+                      </span>
+                      <span>
+                        <span className="member__name" style={{ display: 'block' }}>{fullName(m)}</span>
+                        <span className="member__role">{m.role}</span>
+                      </span>
+                    </StaggerItem>
+                  ))}
+                </Stagger>
+              </DeptAccordion>
+            </Reveal>
           ))}
         </div>
       </section>

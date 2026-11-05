@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 
+import { Tilt } from '@/components/motion/Tilt'
 import { formatDate, timeRange, youtubeId } from '@/lib/format'
 import type { Occurrence } from '@/lib/schedule'
 import type { Ministry, Sermon } from '@/payload-types'
@@ -31,14 +32,16 @@ export function SermonCard({ sermon }: { sermon: Sermon }) {
 
 export function MinistryTile({ ministry, sizes = '(max-width: 700px) 100vw, 25vw' }: { ministry: Ministry; sizes?: string }) {
   return (
-    <Link href={`/ministries/${ministry.slug}`} className="tile">
-      <MediaImage media={ministry.image} sizes={sizes} />
-      <div className="tile__body">
-        <h3 className="tile__title">{ministry.title}</h3>
-        <p className="tile__text">{ministry.excerpt}</p>
-        <span className="tile__more">Learn more <Icon name="arrow" size={15} /></span>
-      </div>
-    </Link>
+    <Tilt className="tilt">
+      <Link href={`/ministries/${ministry.slug}`} className="tile">
+        <MediaImage media={ministry.image} sizes={sizes} />
+        <div className="tile__body">
+          <h3 className="tile__title">{ministry.title}</h3>
+          <p className="tile__text">{ministry.excerpt}</p>
+          <span className="tile__more">Learn more <Icon name="arrow" size={15} /></span>
+        </div>
+      </Link>
+    </Tilt>
   )
 }
 

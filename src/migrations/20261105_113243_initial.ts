@@ -125,6 +125,20 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   await db.run(sql`CREATE UNIQUE INDEX \`ministries_slug_idx\` ON \`ministries\` (\`slug\`);`)
   await db.run(sql`CREATE INDEX \`ministries_updated_at_idx\` ON \`ministries\` (\`updated_at\`);`)
   await db.run(sql`CREATE INDEX \`ministries_created_at_idx\` ON \`ministries\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`ministries_rels\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`order\` integer,
+  	\`parent_id\` integer NOT NULL,
+  	\`path\` text NOT NULL,
+  	\`media_id\` integer,
+  	FOREIGN KEY (\`parent_id\`) REFERENCES \`ministries\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`media_id\`) REFERENCES \`media\`(\`id\`) ON UPDATE no action ON DELETE cascade
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`ministries_rels_order_idx\` ON \`ministries_rels\` (\`order\`);`)
+  await db.run(sql`CREATE INDEX \`ministries_rels_parent_idx\` ON \`ministries_rels\` (\`parent_id\`);`)
+  await db.run(sql`CREATE INDEX \`ministries_rels_path_idx\` ON \`ministries_rels\` (\`path\`);`)
+  await db.run(sql`CREATE INDEX \`ministries_rels_media_id_idx\` ON \`ministries_rels\` (\`media_id\`);`)
   await db.run(sql`CREATE TABLE \`albums\` (
   	\`id\` integer PRIMARY KEY NOT NULL,
   	\`title\` text NOT NULL,
@@ -346,6 +360,27 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   `)
   await db.run(sql`CREATE INDEX \`payload_migrations_updated_at_idx\` ON \`payload_migrations\` (\`updated_at\`);`)
   await db.run(sql`CREATE INDEX \`payload_migrations_created_at_idx\` ON \`payload_migrations\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`home_page_hero_slides\` (
+  	\`_order\` integer NOT NULL,
+  	\`_parent_id\` integer NOT NULL,
+  	\`id\` text PRIMARY KEY NOT NULL,
+  	\`media_id\` integer NOT NULL,
+  	\`poster_id\` integer,
+  	\`eyebrow\` text,
+  	\`heading\` text,
+  	\`text\` text,
+  	\`button_label\` text,
+  	\`button_href\` text,
+  	\`focus\` text DEFAULT 'center',
+  	FOREIGN KEY (\`media_id\`) REFERENCES \`media\`(\`id\`) ON UPDATE no action ON DELETE set null,
+  	FOREIGN KEY (\`poster_id\`) REFERENCES \`media\`(\`id\`) ON UPDATE no action ON DELETE set null,
+  	FOREIGN KEY (\`_parent_id\`) REFERENCES \`home_page\`(\`id\`) ON UPDATE no action ON DELETE cascade
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`home_page_hero_slides_order_idx\` ON \`home_page_hero_slides\` (\`_order\`);`)
+  await db.run(sql`CREATE INDEX \`home_page_hero_slides_parent_id_idx\` ON \`home_page_hero_slides\` (\`_parent_id\`);`)
+  await db.run(sql`CREATE INDEX \`home_page_hero_slides_media_idx\` ON \`home_page_hero_slides\` (\`media_id\`);`)
+  await db.run(sql`CREATE INDEX \`home_page_hero_slides_poster_idx\` ON \`home_page_hero_slides\` (\`poster_id\`);`)
   await db.run(sql`CREATE TABLE \`home_page_pillars\` (
   	\`_order\` integer NOT NULL,
   	\`_parent_id\` integer NOT NULL,
@@ -389,11 +424,18 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	\`hero_eyebrow\` text,
   	\`hero_heading\` text NOT NULL,
   	\`hero_text\` text,
-  	\`hero_image_id\` integer NOT NULL,
   	\`hero_primary_label\` text,
   	\`hero_primary_href\` text,
   	\`hero_secondary_label\` text,
   	\`hero_secondary_href\` text,
+  	\`hero_settings_autoplay\` integer DEFAULT true,
+  	\`hero_settings_pause_on_hover\` integer DEFAULT true,
+  	\`hero_settings_show_arrows\` integer DEFAULT true,
+  	\`hero_settings_show_dots\` integer DEFAULT true,
+  	\`hero_settings_interval\` numeric DEFAULT 7,
+  	\`hero_settings_transition\` text DEFAULT 'fade',
+  	\`hero_settings_speed\` text DEFAULT 'normal',
+  	\`hero_settings_overlay\` text DEFAULT 'medium',
   	\`welcome_heading\` text,
   	\`welcome_text\` text,
   	\`involved_heading\` text,
@@ -403,11 +445,9 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	\`giving_image_id\` integer,
   	\`updated_at\` text,
   	\`created_at\` text,
-  	FOREIGN KEY (\`hero_image_id\`) REFERENCES \`media\`(\`id\`) ON UPDATE no action ON DELETE set null,
   	FOREIGN KEY (\`giving_image_id\`) REFERENCES \`media\`(\`id\`) ON UPDATE no action ON DELETE set null
   );
   `)
-  await db.run(sql`CREATE INDEX \`home_page_hero_image_idx\` ON \`home_page\` (\`hero_image_id\`);`)
   await db.run(sql`CREATE INDEX \`home_page_giving_image_idx\` ON \`home_page\` (\`giving_image_id\`);`)
   await db.run(sql`CREATE TABLE \`home_page_rels\` (
   	\`id\` integer PRIMARY KEY NOT NULL,
@@ -423,6 +463,112 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   await db.run(sql`CREATE INDEX \`home_page_rels_parent_idx\` ON \`home_page_rels\` (\`parent_id\`);`)
   await db.run(sql`CREATE INDEX \`home_page_rels_path_idx\` ON \`home_page_rels\` (\`path\`);`)
   await db.run(sql`CREATE INDEX \`home_page_rels_media_id_idx\` ON \`home_page_rels\` (\`media_id\`);`)
+  await db.run(sql`CREATE TABLE \`about_page_story_steps\` (
+  	\`_order\` integer NOT NULL,
+  	\`_parent_id\` integer NOT NULL,
+  	\`id\` text PRIMARY KEY NOT NULL,
+  	\`label\` text,
+  	\`title\` text NOT NULL,
+  	\`text\` text NOT NULL,
+  	\`image_id\` integer,
+  	FOREIGN KEY (\`image_id\`) REFERENCES \`media\`(\`id\`) ON UPDATE no action ON DELETE set null,
+  	FOREIGN KEY (\`_parent_id\`) REFERENCES \`about_page\`(\`id\`) ON UPDATE no action ON DELETE cascade
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`about_page_story_steps_order_idx\` ON \`about_page_story_steps\` (\`_order\`);`)
+  await db.run(sql`CREATE INDEX \`about_page_story_steps_parent_id_idx\` ON \`about_page_story_steps\` (\`_parent_id\`);`)
+  await db.run(sql`CREATE INDEX \`about_page_story_steps_image_idx\` ON \`about_page_story_steps\` (\`image_id\`);`)
+  await db.run(sql`CREATE TABLE \`about_page_beliefs\` (
+  	\`_order\` integer NOT NULL,
+  	\`_parent_id\` integer NOT NULL,
+  	\`id\` text PRIMARY KEY NOT NULL,
+  	\`title\` text NOT NULL,
+  	\`icon\` text DEFAULT 'sparkle',
+  	FOREIGN KEY (\`_parent_id\`) REFERENCES \`about_page\`(\`id\`) ON UPDATE no action ON DELETE cascade
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`about_page_beliefs_order_idx\` ON \`about_page_beliefs\` (\`_order\`);`)
+  await db.run(sql`CREATE INDEX \`about_page_beliefs_parent_id_idx\` ON \`about_page_beliefs\` (\`_parent_id\`);`)
+  await db.run(sql`CREATE TABLE \`about_page_values\` (
+  	\`_order\` integer NOT NULL,
+  	\`_parent_id\` integer NOT NULL,
+  	\`id\` text PRIMARY KEY NOT NULL,
+  	\`title\` text NOT NULL,
+  	\`text\` text,
+  	FOREIGN KEY (\`_parent_id\`) REFERENCES \`about_page\`(\`id\`) ON UPDATE no action ON DELETE cascade
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`about_page_values_order_idx\` ON \`about_page_values\` (\`_order\`);`)
+  await db.run(sql`CREATE INDEX \`about_page_values_parent_id_idx\` ON \`about_page_values\` (\`_parent_id\`);`)
+  await db.run(sql`CREATE TABLE \`about_page\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`intro\` text NOT NULL,
+  	\`who_heading\` text DEFAULT 'Who we are',
+  	\`who_text\` text NOT NULL,
+  	\`quote\` text,
+  	\`quote_cite\` text,
+  	\`story_heading\` text DEFAULT 'Our story',
+  	\`beliefs_heading\` text DEFAULT 'Our core beliefs',
+  	\`values_heading\` text DEFAULT 'Our core values',
+  	\`show_leaders\` integer DEFAULT true,
+  	\`leaders_text\` text,
+  	\`updated_at\` text,
+  	\`created_at\` text
+  );
+  `)
+  await db.run(sql`CREATE TABLE \`about_page_rels\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`order\` integer,
+  	\`parent_id\` integer NOT NULL,
+  	\`path\` text NOT NULL,
+  	\`media_id\` integer,
+  	FOREIGN KEY (\`parent_id\`) REFERENCES \`about_page\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`media_id\`) REFERENCES \`media\`(\`id\`) ON UPDATE no action ON DELETE cascade
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`about_page_rels_order_idx\` ON \`about_page_rels\` (\`order\`);`)
+  await db.run(sql`CREATE INDEX \`about_page_rels_parent_idx\` ON \`about_page_rels\` (\`parent_id\`);`)
+  await db.run(sql`CREATE INDEX \`about_page_rels_path_idx\` ON \`about_page_rels\` (\`path\`);`)
+  await db.run(sql`CREATE INDEX \`about_page_rels_media_id_idx\` ON \`about_page_rels\` (\`media_id\`);`)
+  await db.run(sql`CREATE TABLE \`community_page_programmes\` (
+  	\`_order\` integer NOT NULL,
+  	\`_parent_id\` integer NOT NULL,
+  	\`id\` text PRIMARY KEY NOT NULL,
+  	\`title\` text NOT NULL,
+  	\`icon\` text DEFAULT 'sparkle',
+  	FOREIGN KEY (\`_parent_id\`) REFERENCES \`community_page\`(\`id\`) ON UPDATE no action ON DELETE cascade
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`community_page_programmes_order_idx\` ON \`community_page_programmes\` (\`_order\`);`)
+  await db.run(sql`CREATE INDEX \`community_page_programmes_parent_id_idx\` ON \`community_page_programmes\` (\`_parent_id\`);`)
+  await db.run(sql`CREATE TABLE \`community_page\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`intro\` text NOT NULL,
+  	\`text\` text NOT NULL,
+  	\`programmes_heading\` text DEFAULT 'Our outreach and community programmes',
+  	\`charity_legal_name\` text,
+  	\`charity_number\` text,
+  	\`charity_address\` text,
+  	\`charity_governing_document\` text,
+  	\`charity_register_url\` text,
+  	\`updated_at\` text,
+  	\`created_at\` text
+  );
+  `)
+  await db.run(sql`CREATE TABLE \`community_page_rels\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`order\` integer,
+  	\`parent_id\` integer NOT NULL,
+  	\`path\` text NOT NULL,
+  	\`media_id\` integer,
+  	FOREIGN KEY (\`parent_id\`) REFERENCES \`community_page\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`media_id\`) REFERENCES \`media\`(\`id\`) ON UPDATE no action ON DELETE cascade
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`community_page_rels_order_idx\` ON \`community_page_rels\` (\`order\`);`)
+  await db.run(sql`CREATE INDEX \`community_page_rels_parent_idx\` ON \`community_page_rels\` (\`parent_id\`);`)
+  await db.run(sql`CREATE INDEX \`community_page_rels_path_idx\` ON \`community_page_rels\` (\`path\`);`)
+  await db.run(sql`CREATE INDEX \`community_page_rels_media_id_idx\` ON \`community_page_rels\` (\`media_id\`);`)
   await db.run(sql`CREATE TABLE \`site_settings\` (
   	\`id\` integer PRIMARY KEY NOT NULL,
   	\`church_name\` text NOT NULL,
@@ -439,10 +585,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	\`youtube\` text,
   	\`tiktok\` text,
   	\`giving_intro\` text,
-  	\`bank_account_name\` text,
-  	\`bank_sort_code\` text,
-  	\`bank_account_number\` text,
-  	\`bank_reference\` text,
   	\`paypal_url\` text,
   	\`in_person_text\` text,
   	\`updated_at\` text,
@@ -460,6 +602,7 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   await db.run(sql`DROP TABLE \`weekly_services\`;`)
   await db.run(sql`DROP TABLE \`ministries_meeting_times\`;`)
   await db.run(sql`DROP TABLE \`ministries\`;`)
+  await db.run(sql`DROP TABLE \`ministries_rels\`;`)
   await db.run(sql`DROP TABLE \`albums\`;`)
   await db.run(sql`DROP TABLE \`albums_rels\`;`)
   await db.run(sql`DROP TABLE \`departments\`;`)
@@ -474,10 +617,19 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   await db.run(sql`DROP TABLE \`payload_preferences\`;`)
   await db.run(sql`DROP TABLE \`payload_preferences_rels\`;`)
   await db.run(sql`DROP TABLE \`payload_migrations\`;`)
+  await db.run(sql`DROP TABLE \`home_page_hero_slides\`;`)
   await db.run(sql`DROP TABLE \`home_page_pillars\`;`)
   await db.run(sql`DROP TABLE \`home_page_stats\`;`)
   await db.run(sql`DROP TABLE \`home_page_involved\`;`)
   await db.run(sql`DROP TABLE \`home_page\`;`)
   await db.run(sql`DROP TABLE \`home_page_rels\`;`)
+  await db.run(sql`DROP TABLE \`about_page_story_steps\`;`)
+  await db.run(sql`DROP TABLE \`about_page_beliefs\`;`)
+  await db.run(sql`DROP TABLE \`about_page_values\`;`)
+  await db.run(sql`DROP TABLE \`about_page\`;`)
+  await db.run(sql`DROP TABLE \`about_page_rels\`;`)
+  await db.run(sql`DROP TABLE \`community_page_programmes\`;`)
+  await db.run(sql`DROP TABLE \`community_page\`;`)
+  await db.run(sql`DROP TABLE \`community_page_rels\`;`)
   await db.run(sql`DROP TABLE \`site_settings\`;`)
 }
