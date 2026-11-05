@@ -7,11 +7,13 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import { Icon } from './Icon'
-import { NAV } from './nav'
+import type { NavItem } from './nav'
+import { NavAnchor } from './NavAnchor'
 
-const isActive = (pathname: string, href: string) => (href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(href + '/'))
+const isActive = (pathname: string, href?: string) =>
+  !href ? false : (href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(href + '/'))
 
-export function Header({ email, phone }: { email?: string | null; phone?: string | null }) {
+export function Header({ items, email, phone }: { items: NavItem[]; email?: string | null; phone?: string | null }) {
   const pathname = usePathname()
   const [scrolled, setScrolled] = useState(false)
   // The menu belongs to the page it was opened on, so navigating closes it automatically.
@@ -47,26 +49,33 @@ export function Header({ email, phone }: { email?: string | null; phone?: string
           </Link>
 
           <nav className="nav" aria-label="Main">
-            {NAV.map((item) =>
+            {items.map((item, i) =>
               item.children ? (
-                <div className="nav__item" key={item.href}>
-                  <Link href={item.href} className="nav__trigger" data-active={item.children.some((c) => isActive(pathname, c.href))}>
-                    {item.label}
-                    <Icon name="chevron" size={14} />
-                  </Link>
+                <div className="nav__item" key={i}>
+                  {item.href ? (
+                    <NavAnchor href={item.href} newTab={item.newTab} className="nav__trigger" data-active={item.children.some((c) => isActive(pathname, c.href)) || isActive(pathname, item.href)}>
+                      {item.label}
+                      <Icon name="chevron" size={14} />
+                    </NavAnchor>
+                  ) : (
+                    <button type="button" className="nav__trigger" aria-haspopup="true" data-active={item.children.some((c) => isActive(pathname, c.href))}>
+                      {item.label}
+                      <Icon name="chevron" size={14} />
+                    </button>
+                  )}
                   <div className="nav__dropdown">
-                    {item.children.map((c) => (
-                      <Link key={c.href} href={c.href} aria-current={isActive(pathname, c.href) ? 'page' : undefined}>
+                    {item.children.map((c, j) => (
+                      <NavAnchor key={j} href={c.href} newTab={c.newTab} aria-current={isActive(pathname, c.href) ? 'page' : undefined}>
                         {c.label}
-                      </Link>
+                      </NavAnchor>
                     ))}
                   </div>
                 </div>
-              ) : (
-                <Link key={item.href} href={item.href} className="nav__link" aria-current={isActive(pathname, item.href) ? 'page' : undefined}>
+              ) : item.href ? (
+                <NavAnchor key={i} href={item.href} newTab={item.newTab} className="nav__link" aria-current={isActive(pathname, item.href) ? 'page' : undefined}>
                   {item.label}
-                </Link>
-              ),
+                </NavAnchor>
+              ) : null,
             )}
           </nav>
 
@@ -95,17 +104,21 @@ export function Header({ email, phone }: { email?: string | null; phone?: string
               <span />
             </button>
             <ul className="mobile-menu__list">
-              {[...NAV, { label: 'Give', href: '/give' }].map((item, i) => (
-                <motion.li key={item.href + item.label} initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.15 + i * 0.05, duration: 0.5 }}>
-                  <Link href={item.href} aria-current={isActive(pathname, item.href) ? 'page' : undefined}>
-                    {item.label}
-                  </Link>
-                  {'children' in item && item.children ? (
+              {[...items, { label: 'Give', href: '/give' } as NavItem].map((item, i) => (
+                <motion.li key={i} initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.15 + i * 0.05, duration: 0.5 }}>
+                  {item.href ? (
+                    <NavAnchor href={item.href} newTab={item.newTab} aria-current={isActive(pathname, item.href) ? 'page' : undefined}>
+                      {item.label}
+                    </NavAnchor>
+                  ) : (
+                    <span className="mobile-menu__label">{item.label}</span>
+                  )}
+                  {item.children?.length ? (
                     <div className="mobile-menu__sub">
-                      {item.children.slice(1).map((c) => (
-                        <Link key={c.href} href={c.href}>
+                      {item.children.map((c, j) => (
+                        <NavAnchor key={j} href={c.href} newTab={c.newTab} aria-current={isActive(pathname, c.href) ? 'page' : undefined}>
                           {c.label}
-                        </Link>
+                        </NavAnchor>
                       ))}
                     </div>
                   ) : null}

@@ -175,6 +175,7 @@ body:has(#main .hero, #main .page-hero) .header:not(.header--scrolled) .header__
   transform: scaleX(1); transform-origin: left;
 }
 .nav__item { position: relative; }
+button.nav__trigger { font: inherit; font-size: 0.93rem; font-weight: 500; cursor: pointer; }
 .nav__dropdown {
   position: absolute; top: calc(100% + 6px); left: 50%; min-width: 230px; padding: 10px;
   background: #fff; color: var(--ink); border-radius: 16px; box-shadow: var(--shadow-lg); border: 1px solid var(--line);
@@ -202,6 +203,7 @@ body:has(#main .hero, #main .page-hero) .header:not(.header--scrolled) .header__
 .mobile-menu__list { list-style: none; padding: 0; margin: 0; }
 .mobile-menu__list a { display: block; font-family: var(--font-display); font-size: 2.1rem; font-weight: 600; padding: 8px 0; }
 .mobile-menu__list a[aria-current='page'] { color: #ff8080; }
+.mobile-menu__label { display: block; font-family: var(--font-display); font-size: 2.1rem; font-weight: 600; padding: 8px 0; }
 .mobile-menu__sub a { font-family: var(--font-body); font-size: 1rem; font-weight: 400; padding: 6px 0 6px 18px; opacity: 0.8; }
 .mobile-menu__footer { margin-top: auto; padding-top: 32px; font-size: 0.95rem; opacity: 0.8; }
 .mobile-menu .header__close { position: absolute; top: 18px; right: var(--gutter); }

@@ -14,6 +14,8 @@ import { convertMarkdownToLexical, editorConfigFactory } from '@payloadcms/richt
 import config from '@payload-config'
 import { getPayload, type CollectionSlug } from 'payload'
 
+import { DEFAULT_NAVIGATION_DATA } from '../src/components/site/nav'
+
 const IMG_DIR = path.resolve('scripts/wp-export/optimized')
 const img = (original: string) => original.replace(/-scaled/, '').replace(/-e\d{10,}/, '').replace(/\.(jpe?g)$/i, '.webp')
 
@@ -526,6 +528,10 @@ async function main() {
     if (!id) throw new Error(`Image not uploaded: ${file}`)
     return id
   }
+
+  // Menu
+  await payload.updateGlobal({ slug: 'navigation', overrideAccess: true, data: DEFAULT_NAVIGATION_DATA })
+  log('set navigation menu')
 
   // Settings
   await payload.updateGlobal({

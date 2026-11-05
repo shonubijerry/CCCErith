@@ -21,6 +21,7 @@ import { WeeklyServices } from './collections/WeeklyServices'
 import { AboutPage } from './globals/AboutPage'
 import { CommunityPage } from './globals/CommunityPage'
 import { HomePage } from './globals/HomePage'
+import { Navigation } from './globals/Navigation'
 import { SiteSettings } from './globals/SiteSettings'
 import { cloudflareEmailAdapter, type EmailBinding } from './lib/cloudflareEmail'
 
@@ -103,7 +104,7 @@ export default buildConfig({
     ContactMessages,
     Users,
   ],
-  globals: [HomePage, AboutPage, CommunityPage, SiteSettings],
+  globals: [HomePage, AboutPage, CommunityPage, SiteSettings, Navigation],
   // Cloudflare Workers allow at most 100,000 PBKDF2 iterations for password hashing.
   auth: { passwordHashIterations: 100000 },
   email: cloudflareEmailAdapter(() => (cloudflare.env as unknown as { EMAIL?: EmailBinding }).EMAIL),

@@ -4,11 +4,20 @@ import config from '@payload-config'
 import { getPayload, type Where } from 'payload'
 import { cache } from 'react'
 
+import { resolveFooter, resolveHeader, type RawFooterColumn, type RawNavItem } from '@/components/site/nav'
+
 export const getPayloadClient = cache(async () => getPayload({ config }))
 
 export const getSiteSettings = cache(async () => {
   const payload = await getPayloadClient()
   return payload.findGlobal({ slug: 'site-settings', depth: 0 })
+})
+
+export const getNavigation = cache(async () => {
+  const payload = await getPayloadClient()
+  // depth 1 fills in linked pages so their slugs are available.
+  const nav = await payload.findGlobal({ slug: 'navigation', depth: 1 })
+  return { header: resolveHeader(nav.headerItems as RawNavItem[]), footer: resolveFooter(nav.footerColumns as RawFooterColumn[]) }
 })
 
 export const getHomePage = cache(async () => {

@@ -1,11 +1,12 @@
 import Image from 'next/image'
-import Link from 'next/link'
 
 import type { SiteSetting } from '@/payload-types'
 
 import { Icon, type IconName } from './Icon'
+import type { FooterColumn } from './nav'
+import { NavAnchor } from './NavAnchor'
 
-export function Footer({ settings }: { settings: SiteSetting }) {
+export function Footer({ settings, columns }: { settings: SiteSetting; columns: FooterColumn[] }) {
   const socials = (['facebook', 'instagram', 'youtube', 'tiktok'] as const).filter((k) => settings[k])
   const year = new Date().getFullYear()
   return (
@@ -25,27 +26,18 @@ export function Footer({ settings }: { settings: SiteSetting }) {
               </div>
             ) : null}
           </div>
-          <div>
-            <h4>Explore</h4>
-            <ul>
-              <li><Link href="/about-us">About Us</Link></li>
-              <li><Link href="/our-team">Our Team</Link></li>
-              <li><Link href="/ministries">Ministries</Link></li>
-              <li><Link href="/events">Services &amp; Events</Link></li>
-              <li><Link href="/sermons">Sermons</Link></li>
-              <li><Link href="/gallery">Gallery</Link></li>
-            </ul>
-          </div>
-          <div>
-            <h4>Church</h4>
-            <ul>
-              <li><Link href="/give">Give</Link></li>
-              <li><Link href="/community-service">Community Service</Link></li>
-              <li><Link href="/safeguarding-policy">Safeguarding</Link></li>
-              <li><Link href="/privacy-policy">Privacy Policy</Link></li>
-              <li><Link href="/cookie-policy">Cookie Policy</Link></li>
-            </ul>
-          </div>
+          {columns.map((col, i) => (
+            <div key={i}>
+              <h4>{col.heading}</h4>
+              <ul>
+                {col.links.map((l, j) => (
+                  <li key={j}>
+                    <NavAnchor href={l.href} newTab={l.newTab}>{l.label}</NavAnchor>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
           <div>
             <h4>Visit us</h4>
             <ul>

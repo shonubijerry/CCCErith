@@ -7,7 +7,7 @@ import { MotionProvider } from '@/components/motion/MotionProvider'
 import { SmoothScroll } from '@/components/motion/SmoothScroll'
 import { Footer } from '@/components/site/Footer'
 import { Header } from '@/components/site/Header'
-import { getSiteSettings } from '@/lib/payload'
+import { getNavigation, getSiteSettings } from '@/lib/payload'
 
 import './globals.css'
 
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = { themeColor: '#300070', colorScheme: 'light' }
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
-  const settings = await getSiteSettings()
+  const [settings, nav] = await Promise.all([getSiteSettings(), getNavigation()])
   const analyticsToken = process.env.NEXT_PUBLIC_CF_ANALYTICS_TOKEN
   return (
     <html lang="en-GB" className={`${display.variable} ${body.variable}`}>
@@ -42,9 +42,9 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <a href="#main" className="skip-link">Skip to content</a>
         <MotionProvider>
           <SmoothScroll />
-          <Header email={settings.email} phone={settings.phone} />
+          <Header items={nav.header} email={settings.email} phone={settings.phone} />
           <main id="main">{children}</main>
-          <Footer settings={settings} />
+          <Footer settings={settings} columns={nav.footer} />
         </MotionProvider>
         {analyticsToken ? (
           <Script

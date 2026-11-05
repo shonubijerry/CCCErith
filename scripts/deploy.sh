@@ -6,7 +6,7 @@
 #
 # Steps:
 #   1. Confirms you are logged in to Cloudflare (pnpm wrangler login)
-#   2. Type check, lint and backup tests (unless --skip-checks)
+#   2. Type check, lint and tests (unless --skip-checks)
 #   3. If you changed collections/fields, creates a database migration for it
 #      (it may ask whether a column was renamed — answer in the terminal)
 #   4. Applies any pending migrations to the live D1 database
@@ -51,8 +51,8 @@ if [[ $SKIP_CHECKS -eq 0 ]]; then
   npx tsc --noEmit || fail "Type errors — fix them or run with --skip-checks"
   bold "Lint"
   pnpm -s lint || fail "Lint errors — fix them or run with --skip-checks"
-  bold "Backup tests"
-  npx vitest run --config ./vitest.config.mts tests/int/backup.int.spec.ts || fail "Backup tests failed"
+  bold "Tests"
+  npx vitest run --config ./vitest.config.mts tests/int/backup.int.spec.ts tests/int/nav.int.spec.ts || fail "Tests failed"
 fi
 
 bold "Checking for content-structure changes"
@@ -64,6 +64,17 @@ if [[ "$after" -gt "$before" ]]; then
 else
   echo "No changes."
 fi
+
+bold "Checking migrations leave team logins alone"
+# Logins (email, password hash, salt) live in the users tables. Only the first migration may create
+# them; any later change, drop, wipe or rewrite of those tables stops the ship.
+for file in src/migrations/2*.ts; do
+  up=$(awk '/export async function up/{on=1} /export async function down/{on=0} on' "$file")
+  if grep -qiE '(ALTER TABLE|DROP TABLE|DELETE FROM|UPDATE|INSERT INTO|REPLACE INTO)[^a-z_]+`?users(_sessions)?`?([^a-z_]|$)' <<<"$up"; then
+    fail "$file changes the users table (team logins). Check it before shipping."
+  fi
+done
+echo "OK"
 
 bold "Applying database migrations (live D1)"
 pnpm run deploy:database

@@ -110,12 +110,14 @@ export interface Config {
     'about-page': AboutPage;
     'community-page': CommunityPage;
     'site-settings': SiteSetting;
+    navigation: Navigation;
   };
   globalsSelect: {
     'home-page': HomePageSelect<false> | HomePageSelect<true>;
     'about-page': AboutPageSelect<false> | AboutPageSelect<true>;
     'community-page': CommunityPageSelect<false> | CommunityPageSelect<true>;
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+    navigation: NavigationSelect<false> | NavigationSelect<true>;
   };
   locale: null;
   widgets: {
@@ -1116,6 +1118,71 @@ export interface SiteSetting {
   createdAt?: string | null;
 }
 /**
+ * Drag items to reorder them. The Give button in the header is fixed and not part of this menu.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "navigation".
+ */
+export interface Navigation {
+  id: number;
+  /**
+   * Up to 8 items. Add sub-items to make a dropdown.
+   */
+  headerItems?:
+    | {
+        label: string;
+        linkType: 'url' | 'page' | 'none';
+        page?: (number | null) | Page;
+        /**
+         * e.g. /sermons or https://youtube.com/…
+         */
+        url?: string | null;
+        newTab?: boolean | null;
+        /**
+         * Up to 10. Leave empty for a plain link.
+         */
+        children?:
+          | {
+              label: string;
+              linkType: 'url' | 'page';
+              page?: (number | null) | Page;
+              /**
+               * e.g. /sermons or https://youtube.com/…
+               */
+              url?: string | null;
+              newTab?: boolean | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * The two link columns in the footer. "Visit us" comes from Site settings.
+   */
+  footerColumns?:
+    | {
+        heading: string;
+        links?:
+          | {
+              label: string;
+              linkType: 'url' | 'page';
+              page?: (number | null) | Page;
+              /**
+               * e.g. /sermons or https://youtube.com/…
+               */
+              url?: string | null;
+              newTab?: boolean | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "home-page_select".
  */
@@ -1291,6 +1358,51 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   givingIntro?: T;
   paypalUrl?: T;
   inPersonText?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "navigation_select".
+ */
+export interface NavigationSelect<T extends boolean = true> {
+  headerItems?:
+    | T
+    | {
+        label?: T;
+        linkType?: T;
+        page?: T;
+        url?: T;
+        newTab?: T;
+        children?:
+          | T
+          | {
+              label?: T;
+              linkType?: T;
+              page?: T;
+              url?: T;
+              newTab?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  footerColumns?:
+    | T
+    | {
+        heading?: T;
+        links?:
+          | T
+          | {
+              label?: T;
+              linkType?: T;
+              page?: T;
+              url?: T;
+              newTab?: T;
+              id?: T;
+            };
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
