@@ -15,8 +15,9 @@
     { "pattern": "cccerithparish.co.uk", "custom_domain": true },
     { "pattern": "www.cccerithparish.co.uk", "custom_domain": true },
   ],
-  // Turned off so search engines only see the real domain.
-  "workers_dev": false,
+  // Keep workers.dev on until the domain's nameservers point to Cloudflare, then set to false
+  // so search engines only see the real domain.
+  "workers_dev": true,
   "preview_urls": false,
   "d1_databases": [
     {
