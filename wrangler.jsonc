@@ -1,0 +1,38 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "cccerith",
+  // Custom entry = the Next.js/Payload app + the nightly backup job (see custom-worker.ts)
+  "main": "custom-worker.ts",
+  "compatibility_date": "2025-08-15",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS",
+  },
+  "observability": { "enabled": true },
+  "d1_databases": [
+    {
+      "binding": "D1",
+      // Filled in after `wrangler d1 create cccerith` (see docs/DEPLOY.md)
+      "database_id": "REPLACE_WITH_D1_DATABASE_ID",
+      "database_name": "cccerith",
+      "remote": true,
+    },
+  ],
+  "r2_buckets": [
+    // Uploaded images
+    { "binding": "R2", "bucket_name": "cccerith-media" },
+    // Backups (latest 2 restore points)
+    { "binding": "BACKUPS", "bucket_name": "cccerith-backups" },
+  ],
+  // Cloudflare Email Service: contact form + password reset emails
+  "send_email": [{ "name": "EMAIL" }],
+  "vars": {
+    "NEXT_PUBLIC_SERVER_URL": "https://cccerithparish.co.uk",
+    "CF_ACCOUNT_ID": "REPLACE_WITH_ACCOUNT_ID",
+    "D1_DATABASE_ID": "REPLACE_WITH_D1_DATABASE_ID",
+  },
+  // Nightly at 02:00 UTC: copy new images; on Sundays also make a full restore point.
+  "triggers": { "crons": ["0 2 * * *"] },
+  // Secrets (set with `wrangler secret put`): PAYLOAD_SECRET, CF_API_TOKEN, TURNSTILE_SECRET_KEY
+}
