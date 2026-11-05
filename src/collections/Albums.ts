@@ -19,7 +19,15 @@ export const Albums: CollectionConfig = {
     { name: 'date', type: 'date', required: true, admin: { date: { pickerAppearance: 'dayOnly', displayFormat: 'd MMM yyyy' } } },
     { name: 'description', type: 'textarea' },
     { name: 'cover', type: 'upload', relationTo: 'media', admin: { description: 'Optional. The first photo is used if empty.' } },
-    { name: 'photos', type: 'upload', relationTo: 'media', hasMany: true, required: true },
+    {
+      name: 'photos',
+      type: 'upload',
+      relationTo: 'media',
+      hasMany: true,
+      required: true,
+      maxRows: 40,
+      admin: { description: 'Up to 40 photos per album. For bigger events, split them into more than one album.' },
+    },
     slugField(),
   ],
 }
