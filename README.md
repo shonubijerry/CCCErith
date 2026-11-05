@@ -40,41 +40,49 @@ shrinks the photos to WebP (the dove hero video was re-encoded with ffmpeg into 
 gallery albums and settings. It refuses to run on a database that already has content unless `SEED_RESET=1`
 (which wipes content but keeps logins).
 
-## Deploying (first time)
+## Deploying
 
-Cloudflare **Workers Paid** plan ($5/month) is required (bundle size). All commands run from this folder.
+**Every time you change the code:**
+
+```bash
+pnpm ship                 # type check, lint, backup tests, migrations, build, deploy (~2–3 min)
+pnpm ship --skip-checks   # same, without the checks (~1 min)
+```
+
+`scripts/deploy.sh` confirms you are logged in to Cloudflare, runs the checks, creates a database
+migration if you changed any collections/fields (it may ask whether a column was renamed — answer in the
+terminal, then commit the new file in `src/migrations/`), applies pending migrations to the live D1 database,
+then builds and uploads the Worker.
+
+**Live site:** https://cccerith.koredujar.workers.dev · admin at `/admin`
+
+### What is already set up (Cloudflare account e5d5d460…)
+
+- Worker `cccerith` (Workers Paid), D1 database `cccerith` (dacada53…), R2 buckets `cccerith-media` and
+  `cccerith-backups` — IDs are in `wrangler.jsonc`.
+- Secret `PAYLOAD_SECRET`. Still to add (each is optional until needed):
+
+```bash
+pnpm wrangler secret put CF_API_TOKEN          # API token with "D1: Edit" — lets the Sunday backup export the database
+pnpm wrangler secret put TURNSTILE_SECRET_KEY  # Cloudflare → Turnstile: spam protection for the contact form
+```
+
+  and put the matching public key in `.env.production` as `NEXT_PUBLIC_TURNSTILE_SITE_KEY=…`, then `pnpm ship`.
+
+### Setting up from scratch (new account)
 
 ```bash
 pnpm wrangler login
-
-# 1. Create resources
-pnpm wrangler d1 create cccerith                 # copy the database_id it prints
-pnpm wrangler r2 bucket create cccerith-media
-pnpm wrangler r2 bucket create cccerith-backups
-```
-
-2. In `wrangler.jsonc` replace `REPLACE_WITH_D1_DATABASE_ID` (twice) and `REPLACE_WITH_ACCOUNT_ID`.
-   Until the domain moves, set `NEXT_PUBLIC_SERVER_URL` to the `*.workers.dev` address.
-
-3. Secrets:
-
-```bash
+pnpm wrangler d1 create cccerith --location weur
+pnpm wrangler r2 bucket create cccerith-media --location weur
+pnpm wrangler r2 bucket create cccerith-backups --location weur
+# put the new IDs in wrangler.jsonc (database_id, account_id, CF_ACCOUNT_ID, D1_DATABASE_ID)
 openssl rand -hex 32 | pnpm wrangler secret put PAYLOAD_SECRET
-pnpm wrangler secret put CF_API_TOKEN          # API token with "D1: Edit" on this account (used by backups)
-pnpm wrangler secret put TURNSTILE_SECRET_KEY  # from Cloudflare dashboard → Turnstile (add the site first)
+pnpm ship
+pnpm seed:remote && ./scripts/upload-media-remote.sh   # load content, then push the image/video files
 ```
 
-4. Public build settings — create `.env.production` (not committed) with:
-
-```bash
-NEXT_PUBLIC_TURNSTILE_SITE_KEY=...      # Turnstile site key
-NEXT_PUBLIC_CF_ANALYTICS_TOKEN=...      # Web Analytics token (optional once the domain is on Cloudflare: enable automatic setup instead)
-NEXT_PUBLIC_IMAGE_RESIZING=false        # set true after the domain moves to Cloudflare (see below)
-```
-
-5. Deploy: `pnpm run deploy` (runs migrations on D1, builds, uploads).
-
-6. Load content into the live database: `pnpm seed:remote`, then open `/admin` and create the first admin login.
+Then open `/admin` straight away and create the first admin login (until one exists, anyone could).
 
 **Email (contact form + password reset):** enable Cloudflare **Email Service** for `cccerithparish.co.uk`
 (Dashboard → Email → Email Service → onboard the domain; it adds SPF/DKIM records and does not touch MX).

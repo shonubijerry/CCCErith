@@ -104,6 +104,8 @@ export default buildConfig({
     Users,
   ],
   globals: [HomePage, AboutPage, CommunityPage, SiteSettings],
+  // Cloudflare Workers allow at most 100,000 PBKDF2 iterations for password hashing.
+  auth: { passwordHashIterations: 100000 },
   email: cloudflareEmailAdapter(() => (cloudflare.env as unknown as { EMAIL?: EmailBinding }).EMAIL),
   graphQL: { disable: true },
   editor: lexicalEditor(),

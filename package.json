@@ -25,7 +25,8 @@
     "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts",
     "seed": "cross-env NODE_OPTIONS=--no-deprecation payload run scripts/seed.ts",
     "seed:remote": "cross-env NODE_ENV=production NODE_OPTIONS=--no-deprecation payload run scripts/seed.ts",
-    "images": "node scripts/prepare-images.mjs"
+    "images": "node scripts/prepare-images.mjs",
+    "ship": "bash scripts/deploy.sh"
   },
   "dependencies": {
     "@opennextjs/cloudflare": "1.20.1",

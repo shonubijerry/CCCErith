@@ -13,24 +13,26 @@
   "d1_databases": [
     {
       "binding": "D1",
-      // Filled in after `wrangler d1 create cccerith` (see docs/DEPLOY.md)
-      "database_id": "REPLACE_WITH_D1_DATABASE_ID",
+      // Created with `wrangler d1 create cccerith --location weur`
+      "database_id": "dacada53-fc03-4302-aaef-2af959d2d8a8",
       "database_name": "cccerith",
       "remote": true,
     },
   ],
   "r2_buckets": [
     // Uploaded images
-    { "binding": "R2", "bucket_name": "cccerith-media" },
+    { "binding": "R2", "bucket_name": "cccerith-media", "remote": true },
     // Backups (latest 2 restore points)
-    { "binding": "BACKUPS", "bucket_name": "cccerith-backups" },
+    { "binding": "BACKUPS", "bucket_name": "cccerith-backups", "remote": true },
   ],
   // Cloudflare Email Service: contact form + password reset emails
   "send_email": [{ "name": "EMAIL" }],
+  "account_id": "e5d5d460d5114f727f30dc01a4b9e363",
   "vars": {
-    "NEXT_PUBLIC_SERVER_URL": "https://cccerithparish.co.uk",
-    "CF_ACCOUNT_ID": "REPLACE_WITH_ACCOUNT_ID",
-    "D1_DATABASE_ID": "REPLACE_WITH_D1_DATABASE_ID",
+    // Switch to https://cccerithparish.co.uk when the domain moves to Cloudflare.
+    "NEXT_PUBLIC_SERVER_URL": "https://cccerith.koredujar.workers.dev",
+    "CF_ACCOUNT_ID": "e5d5d460d5114f727f30dc01a4b9e363",
+    "D1_DATABASE_ID": "dacada53-fc03-4302-aaef-2af959d2d8a8",
   },
   // Nightly at 02:00 UTC: copy new images; on Sundays also make a full restore point.
   "triggers": { "crons": ["0 2 * * *"] },
