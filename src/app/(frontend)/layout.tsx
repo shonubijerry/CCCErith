@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   description:
     'Celestial Church of Christ Noah’s Ark Erith Parish — CCC Kent Regional Headquarters UK. A home of worship, prayer, holiness and spiritual transformation at 33 Bexley Road, Erith.',
   openGraph: { type: 'website', siteName: 'CCC Erith Parish', locale: 'en_GB' },
-  icons: { apple: '/brand/apple-touch-icon.png' },
+  icons: { icon: { url: '/brand/icon.png', type: 'image/png' }, apple: '/brand/apple-touch-icon.png' },
 }
 
 export const viewport: Viewport = { themeColor: '#300070', colorScheme: 'light' }
